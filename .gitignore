@@ -1,0 +1,28 @@
+# Виртуальное окружение Python
+venv/
+
+# Компилированные файлы Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Логи
+*.log
+*.tmp
+
+# Конфигурационные файлы
+.env
+
+# Docker
+*.dockerignore
+docker-compose.override.yml
+
+# Системные файлы macOS
+.DS_Store
+
+# Системные файлы Windows
+Thumbs.db
+desktop.ini
+
+
