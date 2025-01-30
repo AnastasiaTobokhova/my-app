@@ -23,6 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install flake8
+
       - name: Run flake8
         run: flake8 app/
 
@@ -37,9 +38,13 @@ jobs:
         with:
           python-version: 3.9
 
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=${PYTHONPATH}:$(pwd)" >> $GITHUB_ENV
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
+
       - name: Run tests
         run: pytest tests/
 
@@ -59,10 +64,6 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/my-app:latest
-
-
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/my-app:latest
