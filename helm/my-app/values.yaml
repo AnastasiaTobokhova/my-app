@@ -9,8 +9,9 @@ image:
 
 # Настройки сервиса для доступа к приложению
 service:
-  type: ClusterIP
+  type: NodePort
   port: 80
+  nodePort: 3000
 
 # Параметры ресурсов для контейнера 
 resources: {}
