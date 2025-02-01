@@ -16,3 +16,14 @@
   {{- printf "%s-%s" $name .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Генерирует стандартные метки для ресурсов Helm-чарта.
+*/}}
+{{- define "my-app.labels" -}}
+app.kubernetes.io/name: {{ .Chart.Name }}
+helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
