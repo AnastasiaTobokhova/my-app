@@ -11,7 +11,7 @@ image:
 service:
   type: NodePort
   port: 80
-  nodePort: 3000
+  nodePort: 30000
 
 # Параметры ресурсов для контейнера 
 resources: {}
