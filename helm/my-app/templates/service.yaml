@@ -3,11 +3,15 @@ kind: Service
 metadata:
   name: {{ include "my-app.fullname" . }}
   labels:
-    app: {{ include "my-app.name" . }}
+    {{- include "my-app.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
-  - port: {{ .Values.service.port }}
-    targetPort: {{ .Values.service.port }}
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      protocol: TCP
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}
   selector:
-    app: {{ include "my-app.name" . }}
+    {{- include "my-app.selectorLabels" . | nindent 4 }}
