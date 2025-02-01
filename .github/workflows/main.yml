@@ -9,62 +9,79 @@ on:
       - main
 
 jobs:
-  lint:
+  install:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: '3.8'
 
       - name: Install dependencies
         run: |
-          pip install flake8
-
-      - name: Run flake8
-        run: flake8 app/
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
   test:
     runs-on: ubuntu-latest
+    needs: install
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v2
         with:
-          python-version: 3.9
-
-      - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=${PYTHONPATH}:$(pwd)" >> $GITHUB_ENV
+          python-version: '3.8'
 
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run tests
-        run: pytest tests/
+        run: |
+          pytest
 
   build:
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - name: Build Docker image
+        run: |
+          docker build -t my-app:latest .
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build and push Docker image
+      - name: Tag and push Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+          docker tag my-app:latest my-dockerhub-username/my-app:latest
+          docker push my-dockerhub-username/my-app:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker pull my-dockerhub-username/my-app:latest
+            docker stop my-app || true
+            docker rm my-app || true
+            docker run -d --name my-app -p 80:5000 my-dockerhub-username/my-app:latest
+
 
