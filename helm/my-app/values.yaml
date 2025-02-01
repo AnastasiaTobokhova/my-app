@@ -1,0 +1,22 @@
+# Количество реплик вашего приложения
+replicaCount: 2
+
+# Параметры Docker-образа приложения
+image:
+  repository: zephyr878/my-app  
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Настройки сервиса для доступа к приложению
+service:
+  type: ClusterIP
+  port: 80
+
+# Параметры ресурсов для контейнера 
+resources: {}
+
+# Настройка nodeSelector, tolerations, affinity 
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
