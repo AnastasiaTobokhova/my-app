@@ -27,3 +27,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{/*
+Генерирует метки для селектора ресурсов.
+*/}}
+{{- define "my-app.selectorLabels" -}}
+app: {{ .Chart.Name }}
+{{- end -}}
+
+
